@@ -26,24 +26,110 @@ import { formatCurrency } from '@/lib/utils';
 
 export const revalidate = 60; // ISR cache
 
+const DEFAULT_CATEGORIES = [
+  { id: 'c1', name: 'Traditional Hindu', slug: 'traditional-hindu', categoryImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c2', name: 'Royal Indian', slug: 'royal-indian', categoryImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c3', name: 'Muslim Nikah', slug: 'muslim-wedding', categoryImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c4', name: 'South Indian', slug: 'south-indian', categoryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c5', name: 'Punjabi Anand Karaj', slug: 'punjabi-wedding', categoryImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c6', name: 'Marathi Lagna', slug: 'marathi-wedding', categoryImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c7', name: 'Bengali Bibaha', slug: 'bengali-wedding', categoryImage: 'https://images.unsplash.com/photo-1519225438158-f5e921d227b6?w=600&auto=format&fit=crop&q=80' },
+  { id: 'c8', name: 'Modern Luxury', slug: 'modern-luxury', categoryImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80' },
+];
+
+const DEFAULT_TEMPLATES = [
+  {
+    id: 't1',
+    name: 'Vedic Shloka Vivaha',
+    slug: 'vedic-shloka-vivaha',
+    previewImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&auto=format&fit=crop&q=80',
+    price: 0,
+    isPremium: false,
+    category: { name: 'Traditional Hindu', slug: 'traditional-hindu' },
+    designConfiguration: { animationType: 'doors' },
+  },
+  {
+    id: 't2',
+    name: 'Rajwada Palace Gold',
+    slug: 'rajwada-palace-gold',
+    previewImage: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=800&auto=format&fit=crop&q=80',
+    price: 999,
+    isPremium: true,
+    category: { name: 'Royal Indian', slug: 'royal-indian' },
+    designConfiguration: { animationType: 'mandala' },
+  },
+  {
+    id: 't3',
+    name: 'Noor-e-Nikah Mubarak',
+    slug: 'noor-e-nikah-mubarak',
+    previewImage: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80',
+    price: 799,
+    isPremium: true,
+    category: { name: 'Muslim Nikah', slug: 'muslim-wedding' },
+    designConfiguration: { animationType: 'sparkles' },
+  },
+  {
+    id: 't4',
+    name: 'Thirumangalyam Gopuram',
+    slug: 'thirumangalyam-gopuram',
+    previewImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    price: 899,
+    isPremium: true,
+    category: { name: 'South Indian', slug: 'south-indian' },
+    designConfiguration: { animationType: 'bells' },
+  },
+  {
+    id: 't5',
+    name: 'Anand Karaj Heritage',
+    slug: 'anand-karaj-heritage',
+    previewImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80',
+    price: 0,
+    isPremium: false,
+    category: { name: 'Punjabi Wedding', slug: 'punjabi-wedding' },
+    designConfiguration: { animationType: 'petals' },
+  },
+  {
+    id: 't6',
+    name: 'Shubh Lagna Peshwai',
+    slug: 'shubh-lagna-peshwai',
+    previewImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&auto=format&fit=crop&q=80',
+    price: 699,
+    isPremium: true,
+    category: { name: 'Marathi Lagna', slug: 'marathi-wedding' },
+    designConfiguration: { animationType: 'diyas' },
+  },
+];
+
 export default async function LandingPage() {
-  // Fetch popular templates and categories from DB
-  const [categories, trendingTemplates, totalTemplatesCount] = await Promise.all([
-    prisma.templateCategory.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: 'asc' },
-      take: 8,
-    }),
-    prisma.template.findMany({
-      where: { isActive: true },
-      include: {
-        category: { select: { name: true, slug: true } },
-      },
-      orderBy: { createdAt: 'asc' },
-      take: 6,
-    }),
-    prisma.template.count({ where: { isActive: true } }),
-  ]);
+  let categories: any[] = DEFAULT_CATEGORIES;
+  let trendingTemplates: any[] = DEFAULT_TEMPLATES;
+  let totalTemplatesCount = 15;
+
+  try {
+    const [dbCategories, dbTemplates, count] = await Promise.all([
+      prisma.templateCategory.findMany({
+        where: { isActive: true },
+        orderBy: { displayOrder: 'asc' },
+        take: 8,
+      }),
+      prisma.template.findMany({
+        where: { isActive: true },
+        include: {
+          category: { select: { name: true, slug: true } },
+        },
+        orderBy: { createdAt: 'asc' },
+        take: 6,
+      }),
+      prisma.template.count({ where: { isActive: true } }),
+    ]);
+
+    if (dbCategories && dbCategories.length > 0) categories = dbCategories;
+    if (dbTemplates && dbTemplates.length > 0) trendingTemplates = dbTemplates;
+    if (count > 0) totalTemplatesCount = count;
+  } catch (error) {
+    // Database connection may not be available during static build on Vercel
+    console.warn('Prisma DB query skipped during static page collection, using static defaults.');
+  }
 
   const pricingPlans = [
     {

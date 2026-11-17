@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 const rsvpSchema = z.object({
   token: z.string().optional(),
   invitationSlug: z.string(),

@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const createInviteSchema = z.object({
   projectId: z.string().uuid(),
   templateId: z.string().uuid(),

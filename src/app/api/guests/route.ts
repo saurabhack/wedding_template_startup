@@ -4,6 +4,8 @@ import { getCurrentUser } from '@/lib/auth';
 import { z } from 'zod';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 const guestSchema = z.object({
   projectId: z.string().uuid(),
   invitationId: z.string().uuid().optional(),

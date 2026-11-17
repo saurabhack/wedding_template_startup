@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { hashPassword, signSessionToken, setSessionCookie } from '@/lib/auth';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),

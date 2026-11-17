@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const projectSchema = z.object({
   projectName: z.string().min(2, 'Project name is required'),
   brideName: z.string().min(1, 'Bride name is required'),

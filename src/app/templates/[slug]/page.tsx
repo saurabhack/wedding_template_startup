@@ -24,6 +24,8 @@ interface Props {
   params: { slug: string };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function TemplateDetailsPage({ params }: Props) {
   const template = await prisma.template.findUnique({
     where: { slug: params.slug },
